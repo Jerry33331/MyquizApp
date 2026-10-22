@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyQuizApp - Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎬 MyQuizApp</h1>
+                </div>
+                <nav class="nav" id="main-nav">
+                    <ul class="nav-list">
+                        <li id="auth-buttons">
+                            <a href="/login" class="nav-link login-btn">Login</a>
+                            <a href="/register" class="nav-link register-btn">Register</a>
+                        </li>
+                        <li id="user-info" style="display: none;">
+                            <span class="username"></span>
+                            <span class="role-badge"></span>
+                        </li>
+                        <li id="logout-btn" style="display: none;">
+                            <button class="nav-link logout-btn" onclick="auth.logout()">Logout</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            <!-- Landing Page -->
+            <section class="landing-section" id="landing-section">
+                <div class="form-container">
+                    <h2 class="form-title">Welcome to MyQuizApp</h2>
+                    <p>Test your movie knowledge with our quizzes!</p>
+                    <div class="cta-buttons">
+                        <a href="/login" class="btn btn-primary">Login</a>
+                        <a href="/register" class="btn btn-outline">Register</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Login Page -->
+            <section class="auth-section" id="login-section" style="display: none;">
+                <div class="form-container">
+                    <h2 class="form-title">Login</h2>
+                    <form id="login-form" onsubmit="auth.handleLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="login-email">Email</label>
+                            <input type="email" id="login-email" class="form-input" required>
+                            <div class="form-error" id="login-email-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="login-password">Password</label>
+                            <input type="password" id="login-password" class="form-input" required>
+                            <div class="form-error" id="login-password-error"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                        </div>
+                    </form>
+                    <p class="auth-switch">Don't have an account? <a href="/register">Register</a></p>
+                </div>
+            </section>
+
+            <!-- Register Page -->
+            <section class="auth-section" id="register-section" style="display: none;">
+                <div class="form-container">
+                    <h2 class="form-title">Register</h2>
+                    <form id="register-form" onsubmit="auth.handleRegister(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="register-username">Username (3-50 characters)</label>
+                            <input type="text" id="register-username" class="form-input" minlength="3" maxlength="50" required>
+                            <div class="form-error" id="register-username-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="register-email">Email</label>
+                            <input type="email" id="register-email" class="form-input" required>
+                            <div class="form-error" id="register-email-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="register-password">Password (min 8 characters)</label>
+                            <input type="password" id="register-password" class="form-input" minlength="8" required>
+                            <div class="form-error" id="register-password-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="register-confirm">Confirm Password</label>
+                            <input type="password" id="register-confirm" class="form-input" required>
+                            <div class="form-error" id="register-confirm-error"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                        </div>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="/login">Login</a></p>
+                </div>
+            </section>
+
+            <!-- Home Page (for logged in users) -->
+            <section class="home-section" id="home-section" style="display: none;">
+                <div class="form-container">
+                    <h2 class="form-title">Welcome!</h2>
+                    <p>You are logged in. Phase 1 authentication is working!</p>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary" onclick="auth.logout()">Logout</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 MyQuizApp. Phase 1: Foundation and Authentication.</p>
+        </footer>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

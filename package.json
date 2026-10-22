@@ -1,0 +1,31 @@
+{
+  "name": "myquizapp",
+  "version": "1.0.0",
+  "description": "Movie-themed quiz app - High School Project",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/db/init.js"
+  },
+  "keywords": [
+    "quiz",
+    "movie",
+    "express",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.1",
+    "express": "^5.0.0",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.18.0",
+    "express-validator": "^7.0.1",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

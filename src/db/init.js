@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS questions (
     id SERIAL PRIMARY KEY,
     quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE,
     question_text TEXT NOT NULL,
-    choices JSONB NOT NULL CHECK (jsonb_typeof(choices) = 'array' AND array_length(choices, 1) = 4),
+    choices JSONB NOT NULL,
     correct_answer_index INTEGER NOT NULL CHECK (correct_answer_index >= 0 AND correct_answer_index <= 3),
     points INTEGER DEFAULT 1,
     position INTEGER NOT NULL,
@@ -110,18 +110,16 @@ async function initializeDatabase() {
   
   try {
     await client.query('BEGIN');
+    console.log('Transaction started\n');
     
-    // Create tables
     console.log('Creating tables...');
     await client.query(createTables);
     console.log('✓ Tables created\n');
     
-    // Create indexes
     console.log('Creating indexes...');
     await client.query(createIndexes);
     console.log('✓ Indexes created\n');
     
-    // Create triggers
     console.log('Creating triggers...');
     await client.query(createTriggers);
     console.log('✓ Triggers created\n');
@@ -130,8 +128,8 @@ async function initializeDatabase() {
     console.log('✓ Database initialization complete!\n');
     
     // Verify
-    const { rows } = await client.query('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'');
-    console.log('Tables created:', rows.map(r => r.table_name).join(', '));
+    const { rows } = await client.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+    console.log('Tables:', rows.map(r => r.table_name).join(', '));
     
   } catch (error) {
     await client.query('ROLLBACK');

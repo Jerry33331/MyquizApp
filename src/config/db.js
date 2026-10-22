@@ -8,13 +8,15 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 // Create connection pool
+// For Replit: use REPLIT_DB_URL
+// For local: use DB_URL or individual connection params
 const pool = new Pool({
+  connectionString: process.env.REPLIT_DB_URL || process.env.DB_URL || null,
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT, 10) || 5432,
   database: process.env.DB_NAME || 'myquizapp',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || '',
-  connectionString: process.env.DB_URL || null,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

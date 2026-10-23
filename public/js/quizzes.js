@@ -470,6 +470,38 @@ function getMedalClass(index) {
 }
 
 function hideAllSections() {
+
+/**
+ * Reset leaderboard (admin only)
+ */
+async function resetLeaderboard() {
+    if (!window.auth || !window.auth.currentUser || window.auth.currentUser.role !== "admin") {
+        showAlert("Only admin can reset the leaderboard", "error");
+        return;
+    }
+    
+    if (!confirm("Are you sure you want to reset the leaderboard? This will delete ALL attempt data.")) {
+        return;
+    }
+    
+    try {
+        const response = await fetch("/api/leaderboard/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include"
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showAlert(data.message, "success");
+            loadLeaderboard();
+        } else {
+            showAlert(data.error?.message || "Failed to reset leaderboard", "error");
+        }
+    } catch (error) {
+        showAlert("Failed to reset leaderboard", "error");
+    }
+}
     const sections = document.querySelectorAll('main > section');
     sections.forEach(s => s.style.display = 'none');
 }
@@ -484,4 +516,5 @@ if (typeof window !== 'undefined') {
     window.startQuiz = startQuiz;
     window.loadQuizzes = loadQuizzes;
     window.viewQuizDetails = viewQuizDetails;
+    window.resetLeaderboard = resetLeaderboard;
 }

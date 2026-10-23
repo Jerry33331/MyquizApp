@@ -199,6 +199,12 @@
 
             <!-- Leaderboard Page -->
             <section class="leaderboard-section" id="leaderboard-section" style="display: none;">
+                <div class="leaderboard-actions" id="leaderboard-actions" style="display: none; margin-bottom: 20px;">
+                    <button class="btn btn-error" onclick="resetLeaderboard()" id="reset-leaderboard-btn">
+                        <!-- Only visible to admin users -->
+                        Reset Leaderboard
+                    </button>
+                </div>
                 <div class="section-header">
                     <h2 class="section-title">Leaderboard</h2>
                     <p class="section-subtitle">Overall rankings by total quiz attempts</p>

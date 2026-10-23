@@ -5,7 +5,7 @@
 
 const express = require('express');
 const { query } = require('../config/db');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 /**
@@ -107,6 +107,49 @@ router.get('/quiz/:quizId', requireAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       error: { code: 'INTERNAL_ERROR', message: 'Failed to get quiz leaderboard' }
+    });
+  }
+});
+
+/**
+ * POST /api/leaderboard/reset
+ * Reset all leaderboard data (delete all attempts) - ADMIN ONLY
+ */
+router.post('/reset', requireAdmin, async (req, res) => {
+  try {
+    // Delete all attempts
+    await query('DELETE FROM attempts');
+    
+    res.json({
+      success: true,
+      message: 'Leaderboard has been reset. All attempt data has been cleared.'
+    });
+  } catch (error) {
+    console.error('Reset leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to reset leaderboard' }
+    });
+  }
+});
+
+/**
+ * DELETE /api/leaderboard/reset
+ * Alternative: Delete all attempts - ADMIN ONLY
+ */
+router.delete('/reset', requireAdmin, async (req, res) => {
+  try {
+    await query('DELETE FROM attempts');
+    
+    res.json({
+      success: true,
+      message: 'Leaderboard has been reset. All attempt data has been cleared.'
+    });
+  } catch (error) {
+    console.error('Reset leaderboard error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to reset leaderboard' }
     });
   }
 });

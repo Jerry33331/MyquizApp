@@ -16,6 +16,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ===== App Settings =====
+// Trust proxy for Replit (which sets X-Forwarded-For header)
+app.set('trust proxy', true);
+
 // ===== Middleware =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

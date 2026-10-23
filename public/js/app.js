@@ -66,13 +66,14 @@ function startQuiz() {
 }
 
 // Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-    handleNavigation();
-    
-    // Initialize auth
+document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize auth FIRST and wait for it to complete
     if (window.auth && typeof window.auth.initializeAuth === 'function') {
-        window.auth.initializeAuth();
+        await window.auth.initializeAuth();
     }
+    
+    // THEN handle navigation (now auth state is ready)
+    handleNavigation();
 });
 
 // Handle popstate (back/forward buttons)

@@ -159,22 +159,9 @@ function showAlert(message, type = 'info') {
 }
 
 // Initialize on DOM ready
+// Note: Don't handle navigation here - let app.js do it after auth is ready
 document.addEventListener('DOMContentLoaded', () => {
     initializeAuth();
-    
-    // Handle navigation based on URL
-    const path = window.location.pathname;
-    if (path === '/login') {
-        if (landingSection) landingSection.style.display = 'none';
-        if (loginSection) loginSection.style.display = 'block';
-        if (registerSection) registerSection.style.display = 'none';
-        if (homeSection) homeSection.style.display = 'none';
-    } else if (path === '/register') {
-        if (landingSection) landingSection.style.display = 'none';
-        if (loginSection) loginSection.style.display = 'none';
-        if (registerSection) registerSection.style.display = 'block';
-        if (homeSection) homeSection.style.display = 'none';
-    }
 });
 
 // Export for global access

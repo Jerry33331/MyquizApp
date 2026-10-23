@@ -42,7 +42,7 @@ function displayQuizzes(quizzes) {
     quizzes.forEach(quiz => {
         const card = document.createElement('div');
         card.className = 'quiz-card';
-        card.onclick = () => navigateTo('/quiz/' + quiz.id);
+        card.style.cursor = 'pointer';
         
         const categoryClass = `category-${quiz.category.toLowerCase()}`;
         const difficultyClass = `difficulty-${quiz.difficulty.toLowerCase()}`;
@@ -64,13 +64,13 @@ function displayQuizzes(quizzes) {
             </div>
         `;
         
+        card.onclick = () => navigateTo('/quiz/' + quiz.id);
         grid.appendChild(card);
     });
 }
 
 /**
  * View quiz details
- * Does NOT navigate - just loads and displays the quiz
  */
 async function viewQuizDetails(quizId) {
     try {
@@ -111,7 +111,8 @@ function displayQuizDetails() {
     
     // Show section
     hideAllSections();
-    document.getElementById('quiz-detail-section').style.display = 'block';
+    const detailSection = document.getElementById('quiz-detail-section');
+    if (detailSection) detailSection.style.display = 'block';
 }
 
 /**
@@ -360,7 +361,7 @@ async function loadLeaderboard() {
 }
 
 /**
- * Display overall leaderboard
+ * Display leaderboard
  */
 function displayLeaderboard(leaderboard) {
     const tbody = document.getElementById('leaderboard-body');
@@ -473,51 +474,13 @@ function hideAllSections() {
     sections.forEach(s => s.style.display = 'none');
 }
 
-function navigateTo(path) {
-    window.history.pushState({}, '', path);
-    handleNavigation();
+// Export functions to window for HTML onclick handlers
+if (typeof window !== 'undefined') {
+    window.startQuiz = startQuiz;
+    window.previousQuestion = previousQuestion;
+    window.nextQuestion = nextQuestion;
+    window.submitQuiz = submitQuiz;
+    window.retryQuiz = retryQuiz;
+    window.loadQuizzes = loadQuizzes;
+    window.viewQuizDetails = viewQuizDetails;
 }
-
-function handleNavigation() {
-    const path = window.location.pathname;
-    hideAllSections();
-    
-    if (window.auth && window.auth.currentUser) {
-        // Logged in
-        if (path === '/' || path === '') {
-            document.getElementById('home-section').style.display = 'block';
-            loadQuizzes();
-        } else if (path === '/quizzes') {
-            document.getElementById('quizzes-section').style.display = 'block';
-            loadQuizzes();
-        } else if (path === '/history') {
-            document.getElementById('history-section').style.display = 'block';
-            loadHistory();
-        } else if (path === '/leaderboard') {
-            document.getElementById('leaderboard-section').style.display = 'block';
-            loadLeaderboard();
-        } else if (path.startsWith('/quiz/')) {
-            const quizId = path.split('/')[2];
-            viewQuizDetails(quizId);
-        } else if (path === '/admin') {
-            document.getElementById('admin-section').style.display = 'block';
-        }
-    } else {
-        // Not logged in
-        if (path === '/' || path === '') {
-            document.getElementById('landing-section').style.display = 'block';
-        } else if (path === '/login') {
-            document.getElementById('login-section').style.display = 'block';
-        } else if (path === '/register') {
-            document.getElementById('register-section').style.display = 'block';
-        } else {
-            // Redirect to landing if trying to access protected routes
-            navigateTo('/');
-        }
-    }
-    
-    window.auth && window.auth.updateAuthUI();
-}
-
-// Initialize
-window.addEventListener('popstate', handleNavigation);

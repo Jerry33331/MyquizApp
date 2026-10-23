@@ -89,7 +89,7 @@
                             <span id="quiz-detail-questions"></span>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-lg" onclick="startQuiz()" id="start-quiz-btn">
+                    <button class="btn btn-primary btn-lg" onclick="window.startQuiz()" id="start-quiz-btn">
                         Start Quiz
                     </button>
                 </div>
@@ -122,13 +122,13 @@
                     </div>
                     
                     <div class="quiz-navigation">
-                        <button class="btn btn-outline" onclick="previousQuestion()" id="prev-btn" style="display: none;">
+                        <button class="btn btn-outline" onclick="window.previousQuestion()" id="prev-btn" style="display: none;">
                             ← Previous
                         </button>
-                        <button class="btn btn-outline" onclick="nextQuestion()" id="next-btn">
+                        <button class="btn btn-outline" onclick="window.nextQuestion()" id="next-btn">
                             Next →
                         </button>
-                        <button class="btn btn-primary" onclick="submitQuiz()" id="submit-btn" style="display: none;">
+                        <button class="btn btn-primary" onclick="window.submitQuiz()" id="submit-btn" style="display: none;">
                             Submit Quiz
                         </button>
                     </div>
@@ -162,7 +162,7 @@
                     </div>
                     
                     <div class="results-actions">
-                        <button class="btn btn-primary btn-lg btn-block" onclick="retryQuiz()">
+                        <button class="btn btn-primary btn-lg btn-block" onclick="window.retryQuiz()">
                             Try Again
                         </button>
                         <button class="btn btn-outline btn-lg btn-block" onclick="navigateTo('/quizzes')">

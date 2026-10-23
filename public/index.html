@@ -17,23 +17,23 @@
                 </div>
                 <nav class="nav" id="main-nav">
                     <ul class="nav-list">
-                        <li><a href="/" class="nav-link">Home</a></li>
-                        <li><a href="/quizzes" class="nav-link">Quizzes</a></li>
-                        <li><a href="/history" class="nav-link">History</a></li>
-                        <li><a href="/leaderboard" class="nav-link">Leaderboard</a></li>
+                        <li><a href="/" class="nav-link" data-nav="home">Home</a></li>
+                        <li><a href="/quizzes" class="nav-link" data-nav="quizzes">Quizzes</a></li>
+                        <li><a href="/history" class="nav-link" data-nav="history">History</a></li>
+                        <li><a href="/leaderboard" class="nav-link" data-nav="leaderboard">Leaderboard</a></li>
                         <li id="admin-link" style="display: none;">
-                            <a href="/admin" class="nav-link admin-link">Admin</a>
+                            <a href="/admin" class="nav-link admin-link" data-nav="admin">Admin</a>
                         </li>
                         <li id="user-info" style="display: none;">
                             <span class="username"></span>
                             <span class="role-badge"></span>
                         </li>
                         <li id="auth-buttons">
-                            <a href="/login" class="nav-link login-btn">Login</a>
-                            <a href="/register" class="nav-link register-btn">Register</a>
+                            <a href="/login" class="nav-link login-btn" data-nav="login">Login</a>
+                            <a href="/register" class="nav-link register-btn" data-nav="register">Register</a>
                         </li>
                         <li id="logout-btn" style="display: none;">
-                            <button class="nav-link logout-btn" onclick="auth.logout()">Logout</button>
+                            <button class="nav-link logout-btn" data-nav="logout">Logout</button>
                         </li>
                     </ul>
                 </nav>

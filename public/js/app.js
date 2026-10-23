@@ -6,7 +6,13 @@
 // Navigation helper
 function navigateTo(path) {
     window.history.pushState({}, '', path);
-    handleNavigation();
+    // Re-check auth state before navigating
+    if (window.auth && window.auth.currentUser) {
+        handleNavigation();
+    } else {
+        // If auth check fails, go to landing
+        handleNavigation();
+    }
 }
 
 // Handle browser navigation
@@ -74,7 +80,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // THEN handle navigation (now auth state is ready)
     handleNavigation();
+    
+    // Also set up click handlers for nav links to prevent page reload
+    setupNavigationHandlers();
 });
 
+// Prevent default link behavior for SPA navigation
+function setupNavigationHandlers() {
+    const navLinks = document.querySelectorAll('.nav-link[href]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            // Only prevent default for internal app routes
+            if (href && href.startsWith('/') && !href.includes('logout')) {
+                e.preventDefault();
+                navigateTo(href);
+            }
+        });
+    });
+    
+    // Fix for logout button
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn && typeof window.auth !== 'undefined' && window.auth.logout) {
+        logoutBtn.onclick = (e) => {
+            e.preventDefault();
+            window.auth.logout();
+            navigateTo('/');
+        };
+    }
+}
+
 // Handle popstate (back/forward buttons)
-window.addEventListener('popstate', handleNavigation);
+window.addEventListener('popstate', () => {
+    // Re-check auth state before handling navigation
+    if (window.auth && window.auth.currentUser) {
+        handleNavigation();
+    } else {
+        // If not logged in, go to landing
+        navigateTo('/');
+    }
+});

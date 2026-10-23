@@ -158,11 +158,9 @@ function showAlert(message, type = 'info') {
     }
 }
 
-// Initialize on DOM ready
-// Note: Don't handle navigation here - let app.js do it after auth is ready
-document.addEventListener('DOMContentLoaded', () => {
-    initializeAuth();
-});
+// Note: auth.js does NOT initialize on DOMContentLoaded
+// app.js handles initialization to avoid race conditions
+// This file only provides the auth functions for app.js to call
 
 // Export for global access
 if (typeof window !== 'undefined') {

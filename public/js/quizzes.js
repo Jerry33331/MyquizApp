@@ -481,7 +481,7 @@ if (typeof window !== 'undefined') {
     window.nextQuestion = nextQuestion;
     window.submitQuiz = submitQuiz;
     window.retryQuiz = retryQuiz;
-    window.startQuizFromDetails = startQuiz;
+    window.startQuiz = startQuiz;
     window.loadQuizzes = loadQuizzes;
     window.viewQuizDetails = viewQuizDetails;
 }

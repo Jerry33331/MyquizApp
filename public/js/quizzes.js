@@ -42,7 +42,7 @@ function displayQuizzes(quizzes) {
     quizzes.forEach(quiz => {
         const card = document.createElement('div');
         card.className = 'quiz-card';
-        card.onclick = () => viewQuizDetails(quiz.id);
+        card.onclick = () => navigateTo('/quiz/' + quiz.id);
         
         const categoryClass = `category-${quiz.category.toLowerCase()}`;
         const difficultyClass = `difficulty-${quiz.difficulty.toLowerCase()}`;
@@ -70,6 +70,7 @@ function displayQuizzes(quizzes) {
 
 /**
  * View quiz details
+ * Does NOT navigate - just loads and displays the quiz
  */
 async function viewQuizDetails(quizId) {
     try {
@@ -78,7 +79,6 @@ async function viewQuizDetails(quizId) {
             currentQuiz = response.data.quiz;
             currentQuestions = response.data.questions;
             displayQuizDetails();
-            navigateTo('/quiz/' + quizId);
         }
     } catch (error) {
         showAlert(error.message || 'Failed to load quiz', 'error');

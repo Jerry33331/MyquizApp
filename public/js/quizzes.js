@@ -64,7 +64,7 @@ function displayQuizzes(quizzes) {
             </div>
         `;
         
-        card.onclick = () => navigateTo('/quiz/' + quiz.id);
+        card.onclick = () => { viewQuizDetails(quiz.id); navigateTo("/quiz/" + quiz.id); };
         grid.appendChild(card);
     });
 }

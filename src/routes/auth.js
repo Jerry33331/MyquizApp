@@ -63,6 +63,8 @@ router.post('/register', [
       [username, email, passwordHash, 'player']
     );
     
+    console.log('User inserted:', result.rows[0]);
+    
     const user = result.rows[0];
     
     // Create session

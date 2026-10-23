@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyQuizApp - Login</title>
+    <title>MyQuizApp - Movie Quiz</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
@@ -17,13 +17,20 @@
                 </div>
                 <nav class="nav" id="main-nav">
                     <ul class="nav-list">
-                        <li id="auth-buttons">
-                            <a href="/login" class="nav-link login-btn">Login</a>
-                            <a href="/register" class="nav-link register-btn">Register</a>
+                        <li><a href="/" class="nav-link">Home</a></li>
+                        <li><a href="/quizzes" class="nav-link">Quizzes</a></li>
+                        <li><a href="/history" class="nav-link">History</a></li>
+                        <li><a href="/leaderboard" class="nav-link">Leaderboard</a></li>
+                        <li id="admin-link" style="display: none;">
+                            <a href="/admin" class="nav-link admin-link">Admin</a>
                         </li>
                         <li id="user-info" style="display: none;">
                             <span class="username"></span>
                             <span class="role-badge"></span>
+                        </li>
+                        <li id="auth-buttons">
+                            <a href="/login" class="nav-link login-btn">Login</a>
+                            <a href="/register" class="nav-link register-btn">Register</a>
                         </li>
                         <li id="logout-btn" style="display: none;">
                             <button class="nav-link logout-btn" onclick="auth.logout()">Logout</button>
@@ -44,6 +51,173 @@
                         <a href="/login" class="btn btn-primary">Login</a>
                         <a href="/register" class="btn btn-outline">Register</a>
                     </div>
+                </div>
+            </section>
+
+            <!-- Home Page -->
+            <section class="home-section" id="home-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Movie Quizzes</h2>
+                    <p class="section-subtitle">Select a quiz to test your knowledge</p>
+                </div>
+                <div class="quizzes-grid" id="quizzes-grid">
+                    <!-- Quiz cards loaded here -->
+                </div>
+            </section>
+
+            <!-- Quiz List Page -->
+            <section class="quizzes-section" id="quizzes-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">All Quizzes</h2>
+                    <p class="section-subtitle">Browse all available movie quizzes</p>
+                </div>
+                <div class="quizzes-grid" id="all-quizzes-grid">
+                    <!-- Quiz cards loaded here -->
+                </div>
+            </section>
+
+            <!-- Quiz Detail Page -->
+            <section class="quiz-detail-section" id="quiz-detail-section" style="display: none;">
+                <div class="quiz-detail-header">
+                    <button class="btn btn-outline" onclick="navigateTo('/quizzes')">← Back</button>
+                    <div class="quiz-detail-info">
+                        <h2 class="section-title" id="quiz-detail-title"></h2>
+                        <p class="quiz-detail-description" id="quiz-detail-description"></p>
+                        <div class="quiz-detail-meta">
+                            <span class="category-badge" id="quiz-detail-category"></span>
+                            <span class="difficulty-badge" id="quiz-detail-difficulty"></span>
+                            <span id="quiz-detail-questions"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="startQuiz()" id="start-quiz-btn">
+                        Start Quiz
+                    </button>
+                </div>
+            </section>
+
+            <!-- Quiz Page -->
+            <section class="quiz-section" id="quiz-section" style="display: none;">
+                <div class="quiz-header">
+                    <div class="quiz-progress">
+                        <span id="quiz-progress-text">Question 1 of 10</span>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="quiz-progress-bar" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="quiz-timer" id="quiz-timer" style="display: none;">
+                        <span class="timer" id="timer-display">10:00</span>
+                    </div>
+                </div>
+                
+                <div class="quiz-content">
+                    <div class="quiz-question-container">
+                        <div class="quiz-question" id="quiz-question"></div>
+                        <div class="quiz-image-container" id="quiz-image-container" style="display: none;">
+                            <img src="" alt="Movie Poster" class="movie-poster" id="quiz-image">
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-choices" id="quiz-choices">
+                        <!-- Answer choices loaded here -->
+                    </div>
+                    
+                    <div class="quiz-navigation">
+                        <button class="btn btn-outline" onclick="previousQuestion()" id="prev-btn" style="display: none;">
+                            ← Previous
+                        </button>
+                        <button class="btn btn-outline" onclick="nextQuestion()" id="next-btn">
+                            Next →
+                        </button>
+                        <button class="btn btn-primary" onclick="submitQuiz()" id="submit-btn" style="display: none;">
+                            Submit Quiz
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Page -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="results-container">
+                    <h2 class="section-title">Quiz Complete!</h2>
+                    <p class="results-message" id="results-message"></p>
+                    
+                    <div class="results-score-container">
+                        <div class="results-score" id="results-score">0/10</div>
+                        <div class="results-percentage" id="results-percentage">0.00%</div>
+                    </div>
+                    
+                    <div class="results-details card">
+                        <div class="results-details-item">
+                            <span>Correct:</span>
+                            <span id="results-correct">0</span>
+                        </div>
+                        <div class="results-details-item">
+                            <span>Incorrect:</span>
+                            <span id="results-incorrect">0</span>
+                        </div>
+                        <div class="results-details-item">
+                            <span>Time Taken:</span>
+                            <span id="results-time">0 seconds</span>
+                        </div>
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-lg btn-block" onclick="retryQuiz()">
+                            Try Again
+                        </button>
+                        <button class="btn btn-outline btn-lg btn-block" onclick="navigateTo('/quizzes')">
+                            Back to Quizzes
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Page -->
+            <section class="history-section" id="history-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">My Quiz History</h2>
+                    <p class="section-subtitle">View your past quiz attempts</p>
+                </div>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead class="history-header">
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>%</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <!-- History rows loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="history-empty" style="display: none;">
+                        <p>No quiz attempts yet!</p>
+                        <a href="/quizzes" class="btn btn-primary">Browse Quizzes</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Page -->
+            <section class="leaderboard-section" id="leaderboard-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Leaderboard</h2>
+                    <p class="section-subtitle">Overall rankings by total quiz attempts</p>
+                </div>
+                <div class="leaderboard-container">
+                    <table class="leaderboard-table">
+                        <thead class="leaderboard-header">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Username</th>
+                                <th>Total Attempts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Leaderboard rows loaded here -->
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
@@ -76,7 +250,7 @@
                     <h2 class="form-title">Register</h2>
                     <form id="register-form" onsubmit="auth.handleRegister(event)">
                         <div class="form-group">
-                            <label class="form-label" for="register-username">Username (3-50 characters)</label>
+                            <label class="form-label" for="register-username">Username (3-50 chars)</label>
                             <input type="text" id="register-username" class="form-input" minlength="3" maxlength="50" required>
                             <div class="form-error" id="register-username-error"></div>
                         </div>
@@ -86,7 +260,7 @@
                             <div class="form-error" id="register-email-error"></div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="register-password">Password (min 8 characters)</label>
+                            <label class="form-label" for="register-password">Password (min 8 chars)</label>
                             <input type="password" id="register-password" class="form-input" minlength="8" required>
                             <div class="form-error" id="register-password-error"></div>
                         </div>
@@ -103,13 +277,17 @@
                 </div>
             </section>
 
-            <!-- Home Page (for logged in users) -->
-            <section class="home-section" id="home-section" style="display: none;">
-                <div class="form-container">
-                    <h2 class="form-title">Welcome!</h2>
-                    <p>You are logged in. Phase 1 authentication is working!</p>
-                    <div class="cta-buttons">
-                        <button class="btn btn-primary" onclick="auth.logout()">Logout</button>
+            <!-- Admin Page -->
+            <section class="admin-section" id="admin-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Admin Dashboard</h2>
+                    <p class="section-subtitle">Manage quizzes and questions</p>
+                </div>
+                <div class="admin-cards">
+                    <div class="card admin-card">
+                        <h3>📝 Create Quiz</h3>
+                        <p>Add a new movie quiz</p>
+                        <button class="btn btn-primary" onclick="showCreateQuiz()">Create</button>
                     </div>
                 </div>
             </section>
@@ -117,12 +295,18 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>&copy; 2024 MyQuizApp. Phase 1: Foundation and Authentication.</p>
+            <p>&copy; 2024 MyQuizApp. Phase 2: Quiz Engine.</p>
         </footer>
     </div>
 
-    <script src="/js/auth.js"></script>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
     <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/quizzes.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

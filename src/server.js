@@ -1,6 +1,6 @@
 /**
  * MyQuizApp - Express Server
- * Phase 1: Foundation and Authentication
+ * Phase 2: Quiz Engine
  */
 
 const express = require('express');
@@ -74,6 +74,22 @@ app.get('/api/health', async (req, res) => {
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+// Quiz routes
+const quizRoutes = require('./routes/quizzes');
+app.use('/api/quizzes', quizRoutes);
+
+// Question routes
+const questionRoutes = require('./routes/questions');
+app.use('/api/questions', questionRoutes);
+
+// Attempt routes
+const attemptRoutes = require('./routes/attempts');
+app.use('/api/attempts', attemptRoutes);
+
+// Leaderboard routes
+const leaderboardRoutes = require('./routes/leaderboard');
+app.use('/api/leaderboard', leaderboardRoutes);
+
 // ===== Error Handling =====
 app.use('/api/*', (req, res) => {
   res.status(404).json({
@@ -97,7 +113,7 @@ app.get('*', (req, res) => {
 
 // ===== Start Server =====
 app.listen(PORT, () => {
-  console.log(`MyQuizApp Phase 1 Server running on port ${PORT}`);
+  console.log(`MyQuizApp Phase 2 Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);
 });
 

@@ -1,6 +1,6 @@
 /**
  * API Client for MyQuizApp
- * Phase 1: Foundation and Authentication
+ * Phase 2: Quiz Engine
  */
 
 const API_BASE = '/api';
@@ -33,20 +33,42 @@ async function apiRequest(method, endpoint, data = null) {
 const authAPI = {
     register: (username, email, password) => 
         apiRequest('POST', '/auth/register', { username, email, password }),
-    
     login: (email, password) => 
         apiRequest('POST', '/auth/login', { email, password }),
-    
     logout: () => apiRequest('POST', '/auth/logout'),
-    
     getMe: () => apiRequest('GET', '/auth/me'),
 };
 
-// For future phases
-const quizAPI = {};
-const attemptAPI = {};
-const leaderboardAPI = {};
+const quizAPI = {
+    getAll: () => apiRequest('GET', '/quizzes'),
+    getAllAdmin: () => apiRequest('GET', '/quizzes/all'),
+    getById: (quizId) => apiRequest('GET', `/quizzes/${quizId}`),
+    getByCategory: (category) => apiRequest('GET', `/quizzes/category/${category}`),
+    create: (quizData) => apiRequest('POST', '/quizzes', quizData),
+    update: (quizId, quizData) => apiRequest('PUT', `/quizzes/${quizId}`, quizData),
+    delete: (quizId) => apiRequest('DELETE', `/quizzes/${quizId}`),
+};
 
+const questionAPI = {
+    getByQuiz: (quizId) => apiRequest('GET', `/questions/quiz/${quizId}`),
+    create: (questionData) => apiRequest('POST', '/questions', questionData),
+    update: (questionId, questionData) => apiRequest('PUT', `/questions/${questionId}`, questionData),
+    delete: (questionId) => apiRequest('DELETE', `/questions/${questionId}`),
+};
+
+const attemptAPI = {
+    submit: (attemptData) => apiRequest('POST', '/attempts', attemptData),
+    getMyHistory: () => apiRequest('GET', '/attempts/me'),
+    getByQuiz: (quizId) => apiRequest('GET', `/attempts/quiz/${quizId}`),
+    getByUser: (userId) => apiRequest('GET', `/attempts/user/${userId}`),
+};
+
+const leaderboardAPI = {
+    getOverall: () => apiRequest('GET', '/leaderboard'),
+    getByQuiz: (quizId) => apiRequest('GET', `/leaderboard/quiz/${quizId}`),
+};
+
+// Export for global access
 if (typeof window !== 'undefined') {
-    window.api = { authAPI, quizAPI, attemptAPI, leaderboardAPI };
+    window.api = { authAPI, quizAPI, questionAPI, attemptAPI, leaderboardAPI };
 }

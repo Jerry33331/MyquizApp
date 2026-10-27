@@ -64,13 +64,6 @@ function handleNavigation() {
     }
 }
 
-// Start quiz from quiz details
-function startQuiz() {
-    if (typeof startQuizFromDetails === 'function') {
-        startQuizFromDetails();
-    }
-}
-
 // Initialize on load
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize auth FIRST and wait for it to complete

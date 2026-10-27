@@ -30,7 +30,7 @@
 ## 1. Project Overview
 
 ### 1.1 Purpose
-MyQuizApp is a **movie-themed** web-based quiz application designed for classroom use. It allows teachers (admins) to create and manage quizzes, while students can take quizzes, track their progress, and compete on leaderboards.
+MyQuizApp is a **movie-themed** web-based quiz application designed for classroom use with a **game show aesthetic**. It allows teachers (admins) to create and manage quizzes, while students can take quizzes, track their progress, and compete on leaderboards in an engaging, colorful interface.
 
 ### 1.2 Target Users
 - **Students/Players:** High school classmates who take movie quizzes, view scores, track history, see leaderboards
@@ -39,7 +39,7 @@ MyQuizApp is a **movie-themed** web-based quiz application designed for classroo
 ### 1.3 Minimum Viable Product (MVP)
 - 5 **movie-themed** quizzes with 10+ questions each (pre-loaded in database)
 - User authentication (register, login, logout)
-- Quiz taking with scoring
+- Quiz taking with scoring in a game show style interface
 - Attempt history
 - Per-quiz and overall leaderboards
 - Question editor for admins
@@ -49,7 +49,7 @@ MyQuizApp is a **movie-themed** web-based quiz application designed for classroo
 | Decision | Choice |
 |----------|--------|
 | App Name | MyQuizApp (kept) |
-| Theme | Green and Cozy |
+| Theme | Game Show / Kahoot-style |
 | Quiz Topics | All movie-related (Action, Comedy, Horror, Animated, Superhero) |
 | First Admin | First user to register becomes admin automatically |
 | 5 Quizzes | Pre-loaded with movie questions in Phase 1 |
@@ -70,19 +70,21 @@ MyQuizApp is a **movie-themed** web-based quiz application designed for classroo
 
 ### 2.1 Visual Theme
 - **Name:** MyQuizApp
-- **Theme:** Green and Cozy
-- **Primary Color:** Forest Green (#228B22)
-- **Secondary Colors:** Sage Green (#9DC183) for accents, Warm Cream (#FFF8DC) for backgrounds, Soft White (#F8F8FF) for cards
+- **Theme:** Game Show / Kahoot-style
+- **Primary Colors:** Bright Blue (#2D5BA3), Electric Purple (#8A2BE2), Vibrant Pink (#FF69B4), Sunny Yellow (#FFD700), Lime Green (#32CD32)
+- **Background:** Deep Space Blue (#0F1419) for main backgrounds, White (#FFFFFF) for cards
 - **Font:** Open Sans (clean, modern, readable) for body text; 'Bebas Neue' for movie-themed headings
-- **Mood:** Warm, inviting, comfortable - like a cozy movie theater
+- **Mood:** Energetic, competitive, fun - like a live game show
 
 ### 2.2 Design Elements
-- Rounded corners on all cards and buttons (8-12px radius)
-- Soft shadows for depth
-- Green gradient backgrounds
-- Movie reel icons and subtle film strip patterns
-- Warm lighting effects (soft glows)
-- Consistent spacing (20-30px between sections, 15-20px within cards)
+- Rounded corners on all cards and buttons (12-16px radius)
+- Bold, high-contrast shadows for depth
+- Colorful gradient backgrounds on quiz cards
+- Each answer choice has a unique bright color (Blue, Purple, Pink, Orange)
+- Answer cards glow and lift on hover
+- Smooth animations and transitions between questions
+- Consistent spacing (24-32px between sections, 20-24px within cards)
+- Confetti/celebration effects on results page for high scores
 
 ### 2.3 Quiz Topics
 All quizzes are **movie-themed**:

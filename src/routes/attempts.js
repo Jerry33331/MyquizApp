@@ -64,6 +64,14 @@ router.post('/', requireAuth, async (req, res) => {
       });
     }
     
+    // Validate all answers are provided (no null/undefined)
+    if (answers.some(a => a === null || a === undefined)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'All questions must be answered to submit' }
+      });
+    }
+    
     // Calculate score
     let score = 0;
     let totalPossible = 0;

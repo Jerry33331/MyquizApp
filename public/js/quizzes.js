@@ -233,11 +233,10 @@ function nextQuestion() {
  * Submit quiz
  */
 async function submitQuiz() {
-    // Check if all questions are answered
+    // Check if all questions are answered - DO NOT ALLOW INCOMPLETE SUBMISSIONS
     if (currentAnswers.some(a => a === null)) {
-        if (!confirm('You have unanswered questions. Are you sure you want to submit?')) {
-            return;
-        }
+        showAlert('Please answer all questions before submitting!', 'error');
+        return;
     }
     
     // Stop timer
@@ -513,8 +512,9 @@ if (typeof window !== 'undefined') {
     window.nextQuestion = nextQuestion;
     window.submitQuiz = submitQuiz;
     window.retryQuiz = retryQuiz;
-    window.startQuiz = startQuiz;
     window.loadQuizzes = loadQuizzes;
     window.viewQuizDetails = viewQuizDetails;
+    window.loadHistory = loadHistory;
+    window.loadLeaderboard = loadLeaderboard;
     window.resetLeaderboard = resetLeaderboard;
 }

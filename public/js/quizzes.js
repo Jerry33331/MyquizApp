@@ -293,10 +293,16 @@ function displayResults(data) {
 }
 
 /**
- * Retry the same quiz
+ * Retry the same quiz - completely reset state
  */
 function retryQuiz() {
     if (currentQuiz) {
+        // Reset all quiz state
+        currentAnswers = [];
+        currentQuestionIndex = 0;
+        quizStartTime = null;
+        
+        // Reload the quiz fresh
         viewQuizDetails(currentQuiz.id);
     }
 }
@@ -517,4 +523,4 @@ if (typeof window !== 'undefined') {
     window.loadHistory = loadHistory;
     window.loadLeaderboard = loadLeaderboard;
     window.resetLeaderboard = resetLeaderboard;
-}
+    window.retryQuiz = retryQuiz;

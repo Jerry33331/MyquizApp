@@ -55,6 +55,7 @@ function clearUser() {
  */
 function updateAuthUI() {
     const isLoggedIn = currentUser !== null;
+    const isAdmin = isLoggedIn && currentUser.role === 'admin';
     
     // Update nav
     if (authButtons) authButtons.style.display = isLoggedIn ? 'none' : 'flex';
@@ -67,6 +68,14 @@ function updateAuthUI() {
         }
     }
     if (logoutBtn) logoutBtn.style.display = isLoggedIn ? 'block' : 'none';
+    
+    // Admin link visibility
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) adminLink.style.display = isAdmin ? 'block' : 'none';
+    
+    // Admin reset button visibility
+    const leaderboardActions = document.getElementById('leaderboard-actions');
+    if (leaderboardActions) leaderboardActions.style.display = isAdmin ? 'block' : 'none';
     
     // Update page sections
     if (landingSection) landingSection.style.display = isLoggedIn ? 'none' : 'block';

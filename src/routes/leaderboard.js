@@ -115,7 +115,7 @@ router.get('/quiz/:quizId', requireAuth, async (req, res) => {
  * POST /api/leaderboard/reset
  * Reset all leaderboard data (delete all attempts) - ADMIN ONLY
  */
-router.post('/reset', requireAdmin, async (req, res) => {
+router.post('/reset', requireAuth, requireAdmin, async (req, res) => {
   try {
     // Delete all attempts
     await query('DELETE FROM attempts');
@@ -137,7 +137,7 @@ router.post('/reset', requireAdmin, async (req, res) => {
  * DELETE /api/leaderboard/reset
  * Alternative: Delete all attempts - ADMIN ONLY
  */
-router.delete('/reset', requireAdmin, async (req, res) => {
+router.delete('/reset', requireAuth, requireAdmin, async (req, res) => {
   try {
     await query('DELETE FROM attempts');
     

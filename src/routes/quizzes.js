@@ -5,7 +5,7 @@
 
 const express = require('express');
 const { query } = require('../config/db');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 /**
@@ -52,13 +52,7 @@ router.get('/', async (req, res) => {
  * GET /api/quizzes/all
  * Get all quizzes including unpublished (admin only)
  */
-router.get('/all', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      error: { code: 'FORBIDDEN', message: 'Admin access required' }
-    });
-  }
+router.get('/all', requireAuth, requireAdmin, async (req, res) => {
   
   try {
     const result = await query(
@@ -147,13 +141,7 @@ router.get('/:id', requireAuth, async (req, res) => {
  * POST /api/quizzes
  * Create a new quiz (admin only)
  */
-router.post('/', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      error: { code: 'FORBIDDEN', message: 'Admin access required' }
-    });
-  }
+router.post('/', requireAuth, requireAdmin, async (req, res) => {
   
   try {
     const { title, description, category, difficulty = 'Medium', time_limit = 0, is_published = true } = req.body;
@@ -201,13 +189,7 @@ router.post('/', requireAuth, async (req, res) => {
  * PUT /api/quizzes/:id
  * Update a quiz (admin only)
  */
-router.put('/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      error: { code: 'FORBIDDEN', message: 'Admin access required' }
-    });
-  }
+router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   
   try {
     const { title, description, category, difficulty, time_limit, is_published } = req.body;
@@ -246,13 +228,7 @@ router.put('/:id', requireAuth, async (req, res) => {
  * DELETE /api/quizzes/:id
  * Delete a quiz (admin only)
  */
-router.delete('/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({
-      success: false,
-      error: { code: 'FORBIDDEN', message: 'Admin access required' }
-    });
-  }
+router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   
   try {
     const result = await query(

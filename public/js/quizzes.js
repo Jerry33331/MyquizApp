@@ -524,3 +524,532 @@ if (typeof window !== 'undefined') {
     window.loadLeaderboard = loadLeaderboard;
     window.resetLeaderboard = resetLeaderboard;
     window.retryQuiz = retryQuiz;
+// ============================================
+// Admin Functions - Phase 4
+// ============================================
+
+/**
+ * Switch admin tabs
+ */
+function switchAdminTab(tabName) {
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.admin-tab-content');
+    contents.forEach(c => c.style.display = 'none');
+    
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.admin-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(`admin-${tabName}`);
+    if (selectedContent) selectedContent.style.display = 'block';
+    
+    // Add active class to selected tab
+    const selectedTab = Array.from(tabs).find(t => t.onclick.toString().includes(tabName));
+    if (selectedTab) selectedTab.classList.add('active');
+    
+    // Load data for specific tabs
+    if (tabName === 'questions') {
+        loadQuizSelectOptions();
+    } else if (tabName === 'quizzes') {
+        loadQuizzesForAdmin();
+    }
+}
+
+/**
+ * Load quiz options into select dropdowns
+ */
+async function loadQuizSelectOptions() {
+    try {
+        const response = await window.api.quizAPI.getAllAdmin();
+        if (response.success) {
+            const quizzes = response.data.quizzes;
+            
+            // Populate create question quiz select
+            const createQuizSelect = document.getElementById('question-quiz-id');
+            if (createQuizSelect) {
+                createQuizSelect.innerHTML = '<option value="">Select a quiz...</option>';
+                quizzes.forEach(q => {
+                    const option = document.createElement('option');
+                    option.value = q.id;
+                    option.textContent = `${q.title} (${q.category})`;
+                    createQuizSelect.appendChild(option);
+                });
+            }
+            
+            // Populate edit quiz select
+            const editQuizSelect = document.getElementById('edit-quiz-select');
+            if (editQuizSelect) {
+                editQuizSelect.innerHTML = '<option value="">Select a quiz...</option>';
+                quizzes.forEach(q => {
+                    const option = document.createElement('option');
+                    option.value = q.id;
+                    option.textContent = `${q.title} (${q.category})`;
+                    editQuizSelect.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to load quizzes', 'error');
+    }
+}
+
+/**
+ * Create a new question
+ */
+async function createQuestion(event) {
+    event.preventDefault();
+    
+    const quizId = document.getElementById('question-quiz-id').value;
+    const questionText = document.getElementById('question-text').value;
+    const choices = [
+        document.getElementById('choice-0').value,
+        document.getElementById('choice-1').value,
+        document.getElementById('choice-2').value,
+        document.getElementById('choice-3').value
+    ];
+    
+    const correctRadio = document.querySelector('input[name="correct-choice"]:checked');
+    const correctAnswerIndex = correctRadio ? parseInt(correctRadio.value) : 0;
+    const points = parseInt(document.getElementById('question-points').value) || 1;
+    const movieReference = document.getElementById('question-movie').value;
+    const imageUrl = document.getElementById('question-image').value;
+    
+    try {
+        const response = await window.api.questionAPI.create({
+            quiz_id: quizId,
+            question_text: questionText,
+            choices: choices,
+            correct_answer_index: correctAnswerIndex,
+            points: points,
+            movie_reference: movieReference,
+            image_url: imageUrl
+        });
+        
+        if (response.success) {
+            showAlert('Question created successfully!', 'success');
+            event.target.reset();
+            // Reload questions for this quiz
+            if (quizId) {
+                loadQuestionsForQuiz(quizId);
+            }
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to create question', 'error');
+    }
+}
+
+/**
+ * Load questions for a specific quiz
+ */
+async function loadQuestionsForQuiz(quizId) {
+    if (!quizId) {
+        document.getElementById('questions-list').innerHTML = '<p>Select a quiz to view questions</p>';
+        return;
+    }
+    
+    try {
+        const response = await window.api.questionAPI.getByQuiz(quizId);
+        const questionsList = document.getElementById('questions-list');
+        
+        if (response.success && questionsList) {
+            if (response.data.questions.length === 0) {
+                questionsList.innerHTML = '<p>No questions found for this quiz</p>';
+                return;
+            }
+            
+            questionsList.innerHTML = '';
+            
+            response.data.questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question-item';
+                questionEl.innerHTML = `
+                    <div class="question-header">
+                        <span class="question-number">Q${index + 1}</span>
+                        <span class="question-text">${escapeHtml(q.question_text)}</span>
+                        <div class="question-actions">
+                            <button class="btn btn-sm btn-outline" onclick="editQuestion(${q.id})">Edit</button>
+                            <button class="btn btn-sm btn-error" onclick="deleteQuestion(${q.id})">Delete</button>
+                        </div>
+                    </div>
+                    <div class="question-choices">
+                        ${q.choices.map((choice, i) => `
+                            <div class="choice-item ${i === q.correct_answer_index ? 'correct' : ''}">
+                                <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
+                                <span>${escapeHtml(choice)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                questionsList.appendChild(questionEl);
+            });
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to load questions', 'error');
+    }
+}
+
+/**
+ * Edit a question
+ */
+async function editQuestion(questionId) {
+    try {
+        const response = await fetch(`/api/questions/quiz/${questionId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const q = data.data.question;
+            // For now, just show the question details
+            showAlert(`Edit Question ID: ${questionId}\nText: ${q.question_text}`, 'info');
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to load question', 'error');
+    }
+}
+
+/**
+ * Delete a question
+ */
+async function deleteQuestion(questionId) {
+    if (!confirm('Are you sure you want to delete this question?')) {
+        return;
+    }
+    
+    try {
+        const response = await window.api.questionAPI.delete(questionId);
+        if (response.success) {
+            showAlert('Question deleted successfully!', 'success');
+            // Reload the current quiz's questions
+            const quizSelect = document.getElementById('edit-quiz-select');
+            if (quizSelect) {
+                loadQuestionsForQuiz(quizSelect.value);
+            }
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to delete question', 'error');
+    }
+}
+
+/**
+ * Create a new quiz
+ */
+async function createQuiz(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('quiz-title').value;
+    const description = document.getElementById('quiz-description').value;
+    const category = document.getElementById('quiz-category').value;
+    const difficulty = document.getElementById('quiz-difficulty').value;
+    const timeLimit = parseInt(document.getElementById('quiz-time-limit').value) || 0;
+    const isPublished = document.getElementById('quiz-published').value === 'true';
+    
+    try {
+        const data = await window.api.quizAPI.create({
+            title,
+            description,
+            category,
+            difficulty,
+            time_limit: timeLimit * 60, // Convert minutes to seconds
+            is_published: isPublished
+        });
+        if (data.success) {
+            showAlert('Quiz created successfully!', 'success');
+            event.target.reset();
+            loadQuizzesForAdmin();
+            loadQuizSelectOptions();
+        } else {
+            showAlert(data.error?.message || 'Failed to create quiz', 'error');
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to create quiz', 'error');
+    }
+}
+
+/**
+ * Load quizzes for admin management
+ */
+async function loadQuizzesForAdmin() {
+    try {
+        const response = await window.api.quizAPI.getAllAdmin();
+        const quizzesList = document.getElementById('quizzes-list');
+        
+        if (response.success && quizzesList) {
+            if (response.data.quizzes.length === 0) {
+                quizzesList.innerHTML = '<p>No quizzes found</p>';
+                return;
+            }
+            
+            quizzesList.innerHTML = '';
+            
+            response.data.quizzes.forEach(q => {
+                const quizEl = document.createElement('div');
+                quizEl.className = 'quiz-item';
+                quizEl.innerHTML = `
+                    <div class="quiz-info">
+                        <span class="quiz-title">${escapeHtml(q.title)}</span>
+                        <span class="quiz-category">${q.category}</span>
+                        <span class="quiz-difficulty">${q.difficulty}</span>
+                        <span class="quiz-status">${q.is_published ? 'Published' : 'Draft'}</span>
+                    </div>
+                    <div class="quiz-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editQuiz(${q.id})">Edit</button>
+                        <button class="btn btn-sm btn-error" onclick="deleteQuiz(${q.id})">Delete</button>
+                    </div>
+                `;
+                quizzesList.appendChild(quizEl);
+            });
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to load quizzes', 'error');
+    }
+}
+
+/**
+ * Edit a quiz
+ */
+async function editQuiz(quizId) {
+    try {
+        const data = await window.api.quizAPI.getById(quizId);
+        
+        if (data.success) {
+            const q = data.data.quiz;
+            showAlert(`Edit Quiz ID: ${quizId}\nTitle: ${q.title}`, 'info');
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to load quiz', 'error');
+    }
+}
+
+/**
+ * Delete a quiz
+ */
+async function deleteQuiz(quizId) {
+    if (!confirm('Are you sure you want to delete this quiz? This will also delete all its questions!')) {
+        return;
+    }
+    
+    try {
+        const data = await window.api.quizAPI.delete(quizId);
+        if (data.success) {
+            showAlert('Quiz deleted successfully!', 'success');
+            loadQuizzesForAdmin();
+            loadQuizSelectOptions();
+        } else {
+            showAlert(data.error?.message || 'Failed to delete quiz', 'error');
+        }
+    } catch (error) {
+        showAlert(error.message || 'Failed to delete quiz', 'error');
+    }
+}
+
+/**
+ * CSV Template
+ */
+function showCsvTemplate() {
+    const template = `Quiz Title,Category,Difficulty,Question Text,Choice A,Choice B,Choice C,Choice D,Correct Answer (A/B/C/D),Points,Movie Reference,Image URL
+Action Movie Trivia,Action,Medium,Who played John McClane in Die Hard?,"Bruce Willis","Arnold Schwarzenegger","Sylvester Stallone","Jason Statham",B,1,Die Hard,
+Action Movie Trivia,Action,Medium,What color pill does Neo take in The Matrix?,"Red","Blue","Green","White",A,1,The Matrix,
+`;
+    
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quiz_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Preview CSV file
+ */
+async function previewCsv() {
+    const fileInput = document.getElementById('csv-file');
+    if (!fileInput || !fileInput.files[0]) {
+        showAlert('Please select a CSV file first', 'error');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = async function(e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+        
+        // Show first 10 rows for preview
+        const previewContent = document.getElementById('csv-preview-content');
+        const previewDiv = document.getElementById('csv-preview');
+        const importBtn = document.getElementById('import-btn');
+        
+        if (previewContent && previewDiv) {
+            previewContent.innerHTML = '<pre>' + escapeHtml(lines.slice(0, 10).join('\n')) + '</pre>';
+            previewDiv.style.display = 'block';
+            importBtn.style.display = 'inline-block';
+        }
+        
+        // Validate CSV structure
+        validateCsv(lines);
+    };
+    
+    reader.readAsText(file);
+}
+
+/**
+ * Validate CSV structure
+ */
+function validateCsv(lines) {
+    const errorsEl = document.getElementById('csv-errors');
+    const errors = [];
+    
+    if (lines.length < 2) {
+        errors.push('CSV file must have at least 2 lines (header + 1 question)');
+    }
+    
+    const header = lines[0].split(',').map(h => h.trim());
+    const requiredHeaders = ['Quiz Title', 'Category', 'Difficulty', 'Question Text', 'Choice A', 'Choice B', 'Choice C', 'Choice D', 'Correct Answer (A/B/C/D)'];
+    
+    for (const reqHeader of requiredHeaders) {
+        if (!header.includes(reqHeader)) {
+            errors.push(`Missing required header: ${reqHeader}`);
+        }
+    }
+    
+    // Validate data rows (skip header)
+    for (let i = 1; i < Math.min(lines.length, 11); i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+        
+        const values = line.split(',').map(v => v.trim());
+        
+        if (values.length < 9) {
+            errors.push(`Row ${i + 1}: Not enough columns (need at least 9)`);
+        }
+        
+        // Check correct answer is valid
+        if (values.length >= 9) {
+            const correctAns = values[8].toUpperCase();
+            if (!['A', 'B', 'C', 'D'].includes(correctAns)) {
+                errors.push(`Row ${i + 1}: Invalid correct answer '${correctAns}'. Must be A, B, C, or D`);
+            }
+        }
+    }
+    
+    if (errorsEl) {
+        if (errors.length > 0) {
+            errorsEl.innerHTML = '<strong>Errors found:</strong><ul>' + errors.map(e => `<li>${e}</li>`).join('') + '</ul>';
+            document.getElementById('import-btn').style.display = 'none';
+        } else {
+            errorsEl.innerHTML = '<strong>✅ CSV looks good!</strong>';
+            document.getElementById('import-btn').style.display = 'inline-block';
+        }
+    }
+}
+
+/**
+ * Import CSV questions
+ */
+async function importCsv() {
+    const fileInput = document.getElementById('csv-file');
+    if (!fileInput || !fileInput.files[0]) {
+        showAlert('Please select a CSV file first', 'error');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = async function(e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+        
+        // Skip header, process data rows
+        const questions = [];
+        const errors = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+            
+            const values = line.split(',').map(v => v.trim());
+            
+            if (values.length < 9) {
+                errors.push(`Row ${i + 1}: Not enough columns`);
+                continue;
+            }
+            
+            const [quizTitle, category, difficulty, questionText, choiceA, choiceB, choiceC, choiceD, correctAns] = values;
+            const points = values.length >= 10 ? parseInt(values[9]) || 1 : 1;
+            const movieReference = values.length >= 11 ? values[10] : '';
+            const imageUrl = values.length >= 12 ? values[11] : '';
+            
+            // Map correct answer letter to index
+            const correctIndexMap = { A: 0, B: 1, C: 2, D: 3 };
+            const correctAnswerIndex = correctIndexMap[correctAns.toUpperCase()];
+            
+            if (correctAnswerIndex === undefined) {
+                errors.push(`Row ${i + 1}: Invalid correct answer '${correctAns}'`);
+                continue;
+            }
+            
+            questions.push({
+                quizTitle,
+                category,
+                difficulty,
+                questionText,
+                choices: [choiceA, choiceB, choiceC, choiceD],
+                correctAnswerIndex,
+                points,
+                movieReference,
+                imageUrl
+            });
+        }
+        
+        if (errors.length > 0) {
+            showAlert(`Found ${errors.length} errors. Please fix and try again.`, 'error');
+            return;
+        }
+        
+        if (questions.length === 0) {
+            showAlert('No valid questions found in CSV', 'error');
+            return;
+        }
+        
+        // Import questions
+        try {
+            const data = await window.api.questionAPI.import(questions);
+            if (data.success) {
+                showAlert(`✅ Successfully imported ${data.data.imported} questions!`, 'success');
+                fileInput.value = '';
+                document.getElementById('csv-preview').style.display = 'none';
+                document.getElementById('import-btn').style.display = 'none';
+                document.getElementById('csv-errors').innerHTML = '';
+            } else {
+                showAlert(data.error?.message || 'Failed to import questions', 'error');
+            }
+        } catch (error) {
+            showAlert(error.message || 'Failed to import questions', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+}
+
+
+// Export admin functions to window
+if (typeof window !== 'undefined') {
+    window.switchAdminTab = switchAdminTab;
+    window.loadQuizSelectOptions = loadQuizSelectOptions;
+    window.createQuestion = createQuestion;
+    window.loadQuestionsForQuiz = loadQuestionsForQuiz;
+    window.editQuestion = editQuestion;
+    window.deleteQuestion = deleteQuestion;
+    window.createQuiz = createQuiz;
+    window.loadQuizzesForAdmin = loadQuizzesForAdmin;
+    window.editQuiz = editQuiz;
+    window.deleteQuiz = deleteQuiz;
+    window.showCsvTemplate = showCsvTemplate;
+    window.previewCsv = previewCsv;
+    window.validateCsv = validateCsv;
+    window.importCsv = importCsv;
+}

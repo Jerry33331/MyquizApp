@@ -57,7 +57,7 @@ router.get('/quiz/:quizId', requireAuth, async (req, res) => {
  * POST /api/questions
  * Create a new question (admin only)
  */
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { quiz_id, question_text, choices, correct_answer_index, points = 1, position, movie_reference = '', image_url = '' } = req.body;
     
@@ -134,7 +134,7 @@ router.post('/', requireAdmin, async (req, res) => {
  * PUT /api/questions/:id
  * Update a question (admin only)
  */
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { quiz_id, question_text, choices, correct_answer_index, points, position, movie_reference, image_url } = req.body;
     
@@ -234,7 +234,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
  * DELETE /api/questions/:id
  * Delete a question (admin only)
  */
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   try {
     const result = await query(
       'DELETE FROM questions WHERE id = $1 RETURNING id',
@@ -262,3 +262,100 @@ router.delete('/:id', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+/**
+ * POST /api/questions/import
+ * Import questions from CSV (admin only)
+ */
+router.post('/import', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { questions } = req.body;
+    
+    if (!questions || !Array.isArray(questions)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Questions array is required' }
+      });
+    }
+    
+    let importedCount = 0;
+    const errors = [];
+    
+    // Group questions by quiz title for batch processing
+    const quizCache = {};
+    
+    for (const q of questions) {
+      // Validate required fields
+      if (!q.quizTitle || !q.questionText || !q.choices || q.choices.length !== 4 || q.correctAnswerIndex === undefined) {
+        errors.push(`Question: "${q.questionText || 'Unknown'}" - Missing required fields`);
+        continue;
+      }
+      
+      // Check if quiz exists, create if not
+      let quizId;
+      if (quizCache[q.quizTitle]) {
+        quizId = quizCache[q.quizTitle];
+      } else {
+        const quizResult = await query(
+          'SELECT id FROM quizzes WHERE title = $1',
+          [q.quizTitle]
+        );
+        
+        if (quizResult.rows.length === 0) {
+          // Create the quiz
+          const newQuizResult = await query(
+            `INSERT INTO quizzes (title, category, difficulty, is_published) 
+             VALUES ($1, $2, $3, true) RETURNING id`,
+            [q.quizTitle, q.category || 'Action', q.difficulty || 'Medium']
+          );
+          quizId = newQuizResult.rows[0].id;
+          quizCache[q.quizTitle] = quizId;
+        } else {
+          quizId = quizResult.rows[0].id;
+          quizCache[q.quizTitle] = quizId;
+        }
+      }
+      
+      // Get next position
+      const countResult = await query(
+        'SELECT COUNT(*) FROM questions WHERE quiz_id = $1',
+        [quizId]
+      );
+      const position = parseInt(countResult.rows[0].count, 10);
+      
+      // Insert question
+      await query(
+        `INSERT INTO questions (quiz_id, question_text, choices, correct_answer_index, points, position, movie_reference, image_url) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          quizId,
+          q.questionText,
+          JSON.stringify(q.choices),
+          q.correctAnswerIndex,
+          q.points || 1,
+          position,
+          q.movieReference || '',
+          q.imageUrl || ''
+        ]
+      );
+      
+      importedCount++;
+    }
+    
+    res.json({
+      success: true,
+      message: `Imported ${importedCount} questions`,
+      data: {
+        imported: importedCount,
+        errors: errors
+      }
+    });
+  } catch (error) {
+    console.error('CSV import error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to import CSV questions' }
+    });
+  }
+});
+

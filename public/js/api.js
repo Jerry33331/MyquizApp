@@ -54,6 +54,7 @@ const questionAPI = {
     create: (questionData) => apiRequest('POST', '/questions', questionData),
     update: (questionId, questionData) => apiRequest('PUT', `/questions/${questionId}`, questionData),
     delete: (questionId) => apiRequest('DELETE', `/questions/${questionId}`),
+    import: (questions) => apiRequest('POST', '/questions/import', { questions }),
 };
 
 const attemptAPI = {

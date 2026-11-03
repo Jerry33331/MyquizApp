@@ -284,17 +284,166 @@
             <section class="admin-section" id="admin-section" style="display: none;">
                 <div class="section-header">
                     <h2 class="section-title">Admin Dashboard</h2>
-                    <p class="section-subtitle">Manage quizzes and questions</p>
+                    <p class="section-subtitle">Manage quizzes, questions, and CSV imports</p>
                 </div>
-                <div class="admin-cards">
-                    <div class="card admin-card">
-                        <h3>📝 Create Quiz</h3>
-                        <p>Add a new movie quiz</p>
-                        <button class="btn btn-primary" onclick="showCreateQuiz()">Create</button>
+                
+                <!-- Admin Tabs -->
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('questions')">Question Editor</button>
+                    <button class="admin-tab" onclick="switchAdminTab('quizzes')">Quiz Manager</button>
+                    <button class="admin-tab" onclick="switchAdminTab('csv')">CSV Import</button>
+                </div>
+                
+                <!-- Question Editor Tab -->
+                <div class="admin-tab-content" id="admin-questions">
+                    <div class="admin-card">
+                        <h3>🎬 Create New Question</h3>
+                        <form id="create-question-form" onsubmit="createQuestion(event)">
+                            <div class="form-group">
+                                <label class="form-label">Quiz</label>
+                                <select id="question-quiz-id" class="form-input" required>
+                                    <option value="">Select a quiz...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Question Text</label>
+                                <input type="text" id="question-text" class="form-input" placeholder="Enter question text" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Answer Choices (4 required)</label>
+                                <div class="choice-inputs">
+                                    <div class="choice-input">
+                                        <span class="choice-letter">A</span>
+                                        <input type="text" id="choice-0" class="form-input choice-text" placeholder="Choice A" required>
+                                        <input type="radio" name="correct-choice" value="0" class="correct-radio">
+                                    </div>
+                                    <div class="choice-input">
+                                        <span class="choice-letter">B</span>
+                                        <input type="text" id="choice-1" class="form-input choice-text" placeholder="Choice B" required>
+                                        <input type="radio" name="correct-choice" value="1" class="correct-radio">
+                                    </div>
+                                    <div class="choice-input">
+                                        <span class="choice-letter">C</span>
+                                        <input type="text" id="choice-2" class="form-input choice-text" placeholder="Choice C" required>
+                                        <input type="radio" name="correct-choice" value="2" class="correct-radio">
+                                    </div>
+                                    <div class="choice-input">
+                                        <span class="choice-letter">D</span>
+                                        <input type="text" id="choice-3" class="form-input choice-text" placeholder="Choice D" required>
+                                        <input type="radio" name="correct-choice" value="3" class="correct-radio">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Points</label>
+                                <input type="number" id="question-points" class="form-input" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Movie Reference (optional)</label>
+                                <input type="text" id="question-movie" class="form-input" placeholder="e.g., The Dark Knight">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Image URL (optional)</label>
+                                <input type="url" id="question-image" class="form-input" placeholder="https://...">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Create Question</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3>🔍 Edit/Delete Questions</h3>
+                        <p>Select a quiz to view and manage its questions</p>
+                        <div class="form-group">
+                            <select id="edit-quiz-select" class="form-input" onchange="loadQuestionsForQuiz(this.value)">
+                                <option value="">Select a quiz...</option>
+                            </select>
+                        </div>
+                        <div id="questions-list" class="questions-list"></div>
+                    </div>
+                </div>
+                
+                <!-- Quiz Manager Tab -->
+                <div class="admin-tab-content" id="admin-quizzes" style="display: none;">
+                    <div class="admin-card">
+                        <h3>🎬 Create New Quiz</h3>
+                        <form id="create-quiz-form" onsubmit="createQuiz(event)">
+                            <div class="form-group">
+                                <label class="form-label">Title</label>
+                                <input type="text" id="quiz-title" class="form-input" placeholder="e.g., Action Movie Trivia" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea id="quiz-description" class="form-input form-textarea" placeholder="Brief description of the quiz"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="quiz-category" class="form-input" required>
+                                    <option value="">Select category...</option>
+                                    <option value="Action">Action</option>
+                                    <option value="Comedy">Comedy</option>
+                                    <option value="Horror">Horror</option>
+                                    <option value="Animated">Animated</option>
+                                    <option value="Superhero">Superhero</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Difficulty</label>
+                                <select id="quiz-difficulty" class="form-input" required>
+                                    <option value="">Select difficulty...</option>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Time Limit (minutes, 0 for none)</label>
+                                <input type="number" id="quiz-time-limit" class="form-input" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Published</label>
+                                <select id="quiz-published" class="form-input">
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Create Quiz</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3>🔍 Manage Existing Quizzes</h3>
+                        <div id="quizzes-list" class="quizzes-list"></div>
+                    </div>
+                </div>
+                
+                <!-- CSV Import Tab -->
+                <div class="admin-tab-content" id="admin-csv" style="display: none;">
+                    <div class="admin-card">
+                        <h3>🎪 CSV Import</h3>
+                        <p>Upload questions in CSV format. <a href="#" onclick="showCsvTemplate()">Download template</a></p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">CSV File</label>
+                            <input type="file" id="csv-file" class="form-input" accept=".csv">
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="btn btn-primary" onclick="previewCsv()">Preview CSV</button>
+                            <button class="btn btn-success" onclick="importCsv()" id="import-btn" style="display: none;">Import Questions</button>
+                        </div>
+                        
+                        <div id="csv-preview" class="csv-preview" style="display: none;">
+                            <h4>Preview (First 10 rows)</h4>
+                            <div id="csv-preview-content"></div>
+                            <div id="csv-errors" class="csv-errors"></div>
+                        </div>
                     </div>
                 </div>
             </section>
-        </main>
 
         <!-- Footer -->
         <footer class="footer">

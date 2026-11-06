@@ -65,6 +65,18 @@ function displayQuizzes(quizzes) {
         `;
         
         card.onclick = () => { viewQuizDetails(quiz.id); navigateTo("/quiz/" + quiz.id); };
+        
+        // Add timer badge if quiz has time limit
+        if (quiz.time_limit && quiz.time_limit > 0) {
+            const badgesDiv = card.querySelector('.quiz-card-badges');
+            if (badgesDiv) {
+                const timerBadge = document.createElement('span');
+                timerBadge.className = 'timer-badge';
+                timerBadge.innerHTML = '⏱️ Timer Challenge';
+                badgesDiv.appendChild(timerBadge);
+            }
+        }
+        
         grid.appendChild(card);
     });
 }
@@ -108,6 +120,16 @@ function displayQuizDetails() {
         difficultyEl.className = `difficulty-badge difficulty-${currentQuiz.difficulty.toLowerCase()}`;
     }
     if (questionsEl) questionsEl.textContent = `${currentQuestions.length} questions`;
+    
+    // Show timer badge if quiz has time limit
+    const timerBadge = document.getElementById('quiz-detail-timer');
+    if (timerBadge) {
+        if (currentQuiz.time_limit && currentQuiz.time_limit > 0) {
+            timerBadge.style.display = 'inline';
+        } else {
+            timerBadge.style.display = 'none';
+        }
+    }
     
     // Show section
     hideAllSections();
@@ -160,6 +182,17 @@ function displayQuestion() {
     
     // Update question text
     if (questionEl) questionEl.textContent = question.question_text;
+    
+    // Display movie poster if available
+    const imageContainer = document.getElementById('quiz-image-container');
+    const imageEl = document.getElementById('quiz-image');
+    if (imageContainer && imageEl && question.image_url) {
+        imageEl.src = question.image_url;
+        imageEl.alt = `Movie Poster: ${question.movie_reference || 'Quiz Image'}`;
+        imageContainer.style.display = 'block';
+    } else if (imageContainer) {
+        imageContainer.style.display = 'none';
+    }
     
     // Update progress
     const progress = ((currentQuestionIndex + 1) / currentQuestions.length) * 100;

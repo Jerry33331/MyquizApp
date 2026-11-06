@@ -616,6 +616,17 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: var(--space-md);
 }
 
+.timer-badge {
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    color: var(--text-dark);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-sm);
+    animation: pulse 2s ease-in-out infinite;
+}
+
 #start-quiz-btn {
     font-size: 1.2rem;
     padding: var(--space-lg) var(--space-2xl);
@@ -754,6 +765,12 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     border: 4px solid var(--blue);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.quiz-image-container img:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
 }
 
 .quiz-choices {

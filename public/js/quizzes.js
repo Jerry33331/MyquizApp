@@ -1067,7 +1067,7 @@ async function importCsv() {
     
     reader.readAsText(file);
 }
-
+}
 
 // Export admin functions to window
 if (typeof window !== 'undefined') {
